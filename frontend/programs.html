@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- SEO Meta Tags -->
+        <title>Healthcare Programs & Courses | Apollo Allied Health Sciences</title>
+        <meta name="description" content="Explore Apollo's healthcare education programs including MBA, B.Sc in Medical Technology, Physician Assistant & more. Join India's leading medical education institute.">
+        <meta name="keywords" content="healthcare programs, medical courses, allied health sciences, MBA healthcare management, medical laboratory technology, physician assistant course">
+        
+        <!-- Open Graph Tags -->
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="Healthcare Education Programs | Apollo Allied Health Sciences">
+        <meta property="og:description" content="Discover comprehensive healthcare programs at Apollo. MBA, BSc courses in medical technology, healthcare management & more.">
+        <meta property="og:image" content="https://your-domain.com/Frontend/images/programs-banner.jpg">
+        <meta property="og:url" content="https://your-domain.com/programs.html">
+        
+        <!-- Twitter Card Tags -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@ApolloHealthEd">
+        <meta name="twitter:title" content="Healthcare Programs - Apollo Allied Health Sciences">
+        <meta name="twitter:description" content="Transform your career with Apollo's healthcare education programs. Advanced facilities & expert faculty.">
+        
+        <!-- Canonical URL -->
+        <link rel="canonical" href="https://your-domain.com/programs.html">
+    
+        <!-- Resource Hints -->
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+        <link rel="preload" href="/frontend/css/programs.css" as="style">
+        <link rel="preload" href="./Frontend/images/ak_logo.png" as="image">
+        <link rel="icon" href="/frontend/images/ak_logo.png" type="image/png">
+        <!-- Existing StyleSheet Links -->
+        <link rel="stylesheet" href="/frontend/css/main.css">
+    <link rel="stylesheet" href="/frontend/css/programs.css">
+    <script src="scripts/main.js"></script>
+    <script src="scripts/whatsapp.js"></script>
+
+    <!-- Firebase SDKs -->
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <!-- Add SDKs for Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <!-- Firebase Configuration -->
+    <script src="scripts/firebase-config.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+        <!-- Structured Data -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "EducationalOrganization",
+          "name": "Apollo Allied Health Sciences",
+          "url": "https://your-domain.com",
+          "logo": "https://your-domain.com/Frontend/images/ak_logo.png",
+          "hasCourse": [
+            {
+              "@type": "Course",
+              "name": "MBA – Health Service Management",
+              "description": "Develop leadership skills to transform healthcare delivery systems",
+              "provider": "Apollo Allied Health Sciences",
+              "timeToComplete": "P2Y"
+            },
+            {
+              "@type": "Course",
+              "name": "B.Sc Physician Assistant",
+              "description": "Comprehensive training for clinical support to physicians",
+              "provider": "Apollo Allied Health Sciences",
+              "timeToComplete": "P3Y"
+            }
+            // Add other courses similarly
+          ],
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Chennai",
+            "addressRegion": "Tamil Nadu",
+            "addressCountry": "India"
+          }
+        }
+        </script>
+    
+        <!-- Mobile Optimization -->
+        <meta name="theme-color" content="#0056b3">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    </head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <a href="\index.html">
+                    <img src="/frontend/images/ak_logo.png" alt="Apollo Knowledge">
+                </a>
+            </div>
+            <div class="hamburger-menu">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="\index.html">Home</a></li>
+                    <li><a href="about-us.html">About Us</a></li>
+                    <li><a href="programs.html" class="active">Programs</a></li>
+                    <li><a href="centres.html">Centres</a></li>
+                    <li><a href="admissions.html">Admissions</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="cta-button">
+                <a href="enquiry-page.html" class="btn">Enquire Now</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Programs Hero -->
+    <section class="page-hero">
+        <div class="container">
+            <h1 id="programs-page-hero-title">Our Programs</h1>
+            <p id="programs-page-hero-paragraph">Explore our comprehensive range of healthcare education programs</p>
+        </div>
+    </section>
+
+    <!-- Programs List -->
+    <section class="programs-list">
+        <div class="container">
+            <div id="program-grid" class="program-grid">
+                <!-- Static program cards will be removed. Content will be loaded by JavaScript. -->
+                <!-- Example of a placeholder while loading (optional) -->
+                <div class="program-card-placeholder">
+                    <p>Loading programs...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="scripts/programs-content.js"></script>
+    <!-- Enquiry Section -->
+    <section class="enquiry-cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Find Your Perfect Program</h2>
+                <p>Have questions about our programs or need guidance? Our counselors are here to help.</p>
+                <div class="cta-buttons">
+                    <a href="/frontend/enquiry-page.html" class="btn">Enquire Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enquiry Button and Sliding Panel -->
+<div id="enquiry-button">Enquire Now</div>
+
+<div id="enquiry-panel">
+  <div id="panel-header">
+    <span>Enquiry Form</span>
+    <button id="close-panel">&times;</button>
+  </div>
+  <iframe 
+    aria-label="enquire page" 
+    frameborder="5" 
+    style="height:800px;width:100%;border:none;" 
+    src="https://forms.zohopublic.in/unknownuserking15gm1/form/enquirepage/formperma/faIRZvkF9qctvOuEzmSJi_urB9-YQ_XBeUJkRCoVj04"
+    scrolling="yes"
+    allowtransparency="true"
+  ></iframe>
+
+</div>
+
+    
+    <!-- WhatsApp Floating Button Section -->
+<section id="whatsapp-float-section">
+  <!-- WhatsApp Circular Button -->
+  <div class="whatsapp-circle-btn" onclick="toggleWhatsAppModal()">
+    <img src="https://img.icons8.com/ios-filled/50/ffffff/whatsapp--v1.png" alt="WhatsApp"  loading="lazy"/>
+  </div>
+
+  <!-- Overlay for modal -->
+  <div class="overlay" id="overlay" onclick="closeAllModals()"></div>
+
+  <!-- WhatsApp Modal -->
+  <div class="wa-modal" id="wa-modal">
+    <div class="wa-modal-header">
+      <h3>Choose Program</h3>
+      <span class="close-btn" onclick="closeAllModals()">×</span>
+    </div>
+    <select id="wa-program-select">
+      <option value="" disabled selected>-- Select Program --</option>
+      <option value="MBA – Health Service Management">MBA – Health Service Management</option>
+      <option value="B.Sc Physician Assistant">B.Sc Physician Assistant</option>
+      <option value="B.Sc Operation Theatre & Anaesthesia Technology">B.Sc Operation Theatre & Anaesthesia Technology</option>
+      <option value="B.Sc Radiotherapy Technology">B.Sc Radiotherapy Technology</option>
+      <option value="B.Sc Critical Care Technology">B.Sc Critical Care Technology</option>
+      <option value="B.Sc Nuclear Medicine Technology">B.Sc Nuclear Medicine Technology</option>
+      <option value="B.Sc Dialysis Technology">B.Sc Dialysis Technology</option>
+      <option value="B.Sc Medical Laboratory Technology">B.Sc Medical Laboratory Technology</option>
+      <option value="B.Sc Health Psychology">B.Sc Health Psychology</option>
+      <option value="B.Sc Medical Imaging Technology">B.Sc Medical Imaging Technology</option>
+    </select>
+    <button onclick="sendWhatsAppMessage()">Submit</button>
+  </div>
+</section>
+
+<!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="/frontend/images/ak_logo.png" alt="Apollo Knowledge" loading="lazy">
+                    <p>Apollo Allied Health Centres</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Quick Links</h4>
+                        <ul>
+                            <li><a href="\index.html">Home</a></li>
+                            <li><a href="programs.html">Programs</a></li>
+                            <li><a href="centres.html">Centres</a></li>
+                            <li><a href="admissions.html">Admissions</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Programs</h4>
+                        <ul>
+                            <li><a href="programs/health-service-management.html">MBA – Health Service Management</a></li>
+                            <li><a href="programs/physician-assistant.html">B.Sc Physician Assistant</a></li>
+                            <li><a href="programs/medical-laboratory-technology.html">B.Sc Medical Laboratory Technology</a></li>
+                            <li><a href="programs.html">View All Programs</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Contact Us</h4>
+                        <ul>
+                            <li><i class="fas fa-phone"></i> +91 1234567890</li>
+                            <li><i class="fas fa-envelope"></i> info@apolloalliedhealth.edu</li>
+                            <li><i class="fas fa-map-marker-alt"></i> Chennai, Coimbatore, Chittoor</li>
+                            <li><a href="https://wa.me/1234567890?text=Hello%20Apollo%20Allied%20Health%20Centre,%20I'm%20interested%20in%20learning%20more%20about%20your%20programs."><i class="fab fa-whatsapp"></i> WhatsApp Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Apollo Allied Health Centres. All rights reserved.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
