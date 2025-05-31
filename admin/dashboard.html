@@ -51,9 +51,10 @@
                         </div>
 
                         <div class="input-group">
-                            <label for="hero-image-url">Slide Image URL</label>
-                            <input type="text" id="hero-image-url" name="heroImageUrl" placeholder="Enter image URL (e.g., https://example.com/image.jpg)">
-                            <small>Enter the full URL of the image. Ensure the image is hosted and publicly accessible.</small>
+                            <label for="hero-image-upload">Slide Image</label>
+                            <input type="file" id="hero-image-upload" name="hero-image-upload" accept="image/*">
+                            <img id="hero-image-preview" src="#" alt="Image Preview" style="max-width: 200px; max-height: 200px; display: none; margin-top: 10px;">
+                            <small>Upload an image for the slide.</small>
                         </div>
                         
                         <div class="form-actions">
@@ -133,9 +134,10 @@
                         </div>
 
                         <div class="input-group">
-                            <label for="program-image-url">Card Image URL</label>
-                            <input type="text" id="program-image-url" name="programImageUrl" placeholder="Enter image URL (e.g., https://example.com/image.jpg)">
-                            <small>Enter the full URL of the image. Ensure the image is hosted and publicly accessible.</small>
+                            <label for="program-image-upload">Card Image</label>
+                            <input type="file" id="program-image-upload" name="program-image-upload" accept="image/*">
+                            <img id="program-image-preview" src="#" alt="Program Image Preview" style="max-width: 200px; max-height: 200px; display: none; margin-top: 10px;">
+                            <small>Upload an image for the program card.</small>
                         </div>
                         
                         <div class="form-actions">
@@ -158,13 +160,18 @@
         </section>
     </main>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-    <!-- Firebase Configuration -->
-    <script src="../frontend/scripts/firebase-config.js"></script>
+    <!-- MSAL.js SDK (already added in index.html, but ensure it's available if dashboard is loaded standalone) -->
+    <script src="https://alcdn.msauth.net/browser/2.14.2/js/msal-browser.min.js"></script>
+    <!-- Azure Cosmos DB SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@azure/cosmos@3/dist/cosmos-browser.min.js"></script>
+    <!-- Azure Blob Storage SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@azure/storage-blob@12/dist/azure-storage-blob.min.js"></script>
+
+    <!-- Firebase App and Config (only if still needed for other Firebase services e.g. Remote Config, Analytics, etc.) -->
+    <!-- For this migration, we are removing Firestore and Storage. Auth is already B2C. -->
+    <!-- <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script> -->
+    <!-- <script src="../frontend/scripts/firebase-config.js"></script> -->
+
     <!-- Admin Dashboard Script -->
     <script src="dashboard.js"></script>
 </body>

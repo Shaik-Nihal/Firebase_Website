@@ -1,104 +1,100 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Ensure Firebase is initialized (it should be by firebase-config.js)
-    if (typeof firebase === 'undefined' || typeof firebase.firestore === 'undefined') {
-        console.error("Firebase not initialized. Make sure firebase-config.js is loaded before this script.");
-        // Optionally display an error message to the user on the page
-        const heroTitleElement = document.getElementById('programs-page-hero-title');
-        const programGridElement = document.getElementById('program-grid');
-        if (heroTitleElement) {
-            heroTitleElement.textContent = "Error Loading Content";
-        }
-        if (programGridElement) {
-            programGridElement.innerHTML = '<p class="error-message">Could not load programs. Please check your connection or try again later.</p>';
-        }
-        return;
-    }
+    const heroTitleElement = document.getElementById('programs-page-hero-title');
+    const heroParagraphElement = document.getElementById('programs-page-hero-paragraph');
+    const programGridElement = document.getElementById('program-grid');
+    const API_BASE_URL = "/api"; // Assuming functions are served under /api path
 
-    const db = firebase.firestore();
+    // Removed initializeCosmosClientsProgramsPage function
 
     // Fetch and Display Programs Page Hero Content
     async function displayProgramsPageHero() {
-        const heroTitleElement = document.getElementById('programs-page-hero-title');
-        const heroParagraphElement = document.getElementById('programs-page-hero-paragraph');
-
         if (!heroTitleElement || !heroParagraphElement) {
             console.error("Programs page hero elements not found in DOM.");
             return;
         }
 
         try {
-            const programsPageCollection = db.collection('programs_page');
-            const doc = await programsPageCollection.doc('main_content').get();
-
-            if (doc.exists) {
-                const data = doc.data();
-                heroTitleElement.textContent = data.heroTitle || "Our Programs"; // Fallback
-                heroParagraphElement.textContent = data.heroParagraph || "Explore our comprehensive range of healthcare education programs"; // Fallback
-            } else {
-                console.log("Programs page hero document ('main_content') not found.");
-                // Keep default static content or set specific fallbacks
-                heroTitleElement.textContent = "Our Programs (Default)";
-                heroParagraphElement.textContent = "Explore our comprehensive range of healthcare education programs (Default)";
+            const response = await fetch(`${API_BASE_URL}/programs_page`);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
             }
+            const item = await response.json();
+
+            // The API for programs_page-get is designed to return a default object if not found,
+            // or the actual item.
+            heroTitleElement.textContent = item.heroTitle || "Our Programs";
+            heroParagraphElement.textContent = item.heroParagraph || "Explore our comprehensive range of healthcare education programs";
+
         } catch (error) {
-            console.error("Error fetching programs page hero content:", error);
-            // Keep default static content or display an error
-             heroTitleElement.textContent = "Error Loading Title";
-             heroParagraphElement.textContent = "Could not load description. Please try again.";
+            console.error("Error fetching programs page hero content from API:", error);
+            heroTitleElement.textContent = "Error Loading Title";
+            heroParagraphElement.textContent = "Could not load description. Please try again.";
         }
     }
 
     // Fetch and Display Program Cards
     async function displayProgramCards() {
-        const programGridElement = document.getElementById('program-grid');
-
         if (!programGridElement) {
             console.error("Program grid element not found in DOM.");
             return;
         }
-
-        programGridElement.innerHTML = '<div class="program-card-placeholder"><p>Loading programs...</p></div>'; // Clear and show loading
+        programGridElement.innerHTML = '<div class="program-card-placeholder"><p>Loading programs...</p></div>';
 
         try {
-            const programsCollection = db.collection('programs');
-            const snapshot = await programsCollection.orderBy('order').get();
+            const response = await fetch(`${API_BASE_URL}/programs`);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+            }
+            const items = await response.json();
 
-            if (snapshot.empty) {
+            if (!items || items.length === 0) {
                 programGridElement.innerHTML = '<p>No programs available at the moment. Please check back later.</p>';
                 return;
             }
 
             programGridElement.innerHTML = ''; // Clear loading message
 
-            snapshot.forEach(doc => {
-                const data = doc.data();
-
+            items.forEach(item => {
                 const cardDiv = document.createElement('div');
                 cardDiv.classList.add('program-card');
 
                 const img = document.createElement('img');
-                img.src = data.imageUrl || 'frontend/images/placeholder-program.jpg'; // Fallback image
-                img.alt = data.title || 'Program image';
+                img.src = item.imageUrl || 'frontend/images/placeholder-program.jpg';
+                img.alt = item.title || 'Program image';
                 img.loading = 'lazy';
+                img.onerror = function() { this.src = 'https://placehold.co/300x200/ff0000/ffffff?text=Image+Error'; };
+
 
                 const contentDiv = document.createElement('div');
                 contentDiv.classList.add('program-content');
 
                 const h3 = document.createElement('h3');
-                h3.textContent = data.title || 'Untitled Program';
+                h3.textContent = item.title || 'Untitled Program';
 
                 const p = document.createElement('p');
-                p.textContent = data.description || 'No description available.';
+                p.textContent = item.description || 'No description available.';
 
                 const footerDiv = document.createElement('div');
                 footerDiv.classList.add('program-footer');
 
                 const durationSpan = document.createElement('span');
                 durationSpan.classList.add('duration');
-                durationSpan.innerHTML = `<i class="far fa-clock"></i> ${data.duration || 'N/A'}`;
+                durationSpan.innerHTML = `<i class="far fa-clock"></i> ${item.duration || 'N/A'}`;
 
                 const linkA = document.createElement('a');
-                linkA.href = data.linkUrl || '#';
+                let programLink = item.linkUrl || '#';
+                // Logic for constructing correct program link (relative to current page or absolute)
+                // This assumes linkUrl might be like "program-name.html" and needs to be in "programs/" folder
+                if (!programLink.startsWith('http') && !programLink.startsWith('/') && !programLink.startsWith('programs/')) {
+                     if (!programLink.includes('/')) {
+                         programLink = `programs/${programLink}`;
+                     }
+                }
+
+
+                linkA.href = programLink;
                 linkA.classList.add('btn');
                 linkA.textContent = 'Learn More';
 
@@ -116,12 +112,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
         } catch (error) {
-            console.error("Error fetching program cards:", error);
+            console.error("Error fetching program cards from API:", error);
             programGridElement.innerHTML = '<p class="error-message">Error loading programs. Please try refreshing the page.</p>';
         }
     }
 
     // Call functions to display content
+    // No explicit SDK client initialization needed here anymore
     displayProgramsPageHero();
     displayProgramCards();
 });

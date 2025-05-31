@@ -1,30 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Ensure Firebase is initialized
-    if (typeof firebase === 'undefined' || typeof firebase.firestore === 'undefined') {
-        console.error("Firebase not initialized. Make sure firebase-config.js is loaded before this script.");
-        const heroSliderContainer = document.getElementById('hero-slider');
-        if (heroSliderContainer) {
-            heroSliderContainer.innerHTML = `
+    const heroSliderContainer = document.getElementById('hero-slider');
+    const sliderDotsContainer = document.getElementById('slider-dots');
+    const programCardsContainer = document.querySelector('.featured-programs .program-cards'); // Assuming this is the container for program cards
+
+    const LOCAL_STORAGE_KEY_SLIDES = 'heroSlidesDataCache';
+    const LOCAL_STORAGE_KEY_PROGRAM_CARDS = 'homeProgramCardsCache';
+    const API_BASE_URL = "/api"; // Assuming functions are served under /api path
+
+    // Removed initializeCosmosClients function
+
+    function displayErrorPlaceholder(container, title, message) {
+        if (container) {
+            container.innerHTML = `
                 <div class="slide active">
-                    <img src="https://placehold.co/1200x500/ff0000/ffffff?text=Configuration+Error" alt="Error loading content" loading="lazy">
+                    <img src="https://placehold.co/1200x500/ff0000/ffffff?text=${encodeURIComponent(title)}" alt="Error loading content" loading="lazy">
                     <div class="slide-content">
-                        <h1>Configuration Error</h1>
-                        <p>Could not initialize services. Please contact support or try again later.</p>
+                        <h1>${title}</h1>
+                        <p>${message}</p>
                     </div>
                 </div>`;
         }
         const sliderControls = document.querySelector('.slider-controls');
-        if (sliderControls) sliderControls.style.display = 'none';
-        return;
+        if (sliderControls && container === heroSliderContainer) sliderControls.style.display = 'none';
     }
-
-    const db = firebase.firestore();
-    const heroCollection = db.collection('hero_section'); // Ensure this matches your Firestore collection name
-
-    const heroSliderContainer = document.getElementById('hero-slider');
-    const sliderDotsContainer = document.getElementById('slider-dots');
-
-    const LOCAL_STORAGE_KEY_SLIDES = 'heroSlidesDataCache';
 
     /**
      * Renders slides into the DOM from the provided slidesData.
@@ -139,82 +137,165 @@ document.addEventListener('DOMContentLoaded', () => {
                             console.error("initializeSlider function is not defined. Slider will not work with cached data.");
                         }
                     }
-                } else { // Cache exists but is empty (e.g. Firestore was empty on last fetch)
-                    renderSlidesUI([], heroSliderContainer, sliderDotsContainer); // Show "empty" state
+                } else {
+                    renderSlidesUI([], heroSliderContainer, sliderDotsContainer);
                 }
             }
         } catch (e) {
             console.error("Error reading from local storage or parsing cached slides:", e);
-            localStorage.removeItem(LOCAL_STORAGE_KEY_SLIDES); // Clear potentially corrupted cache
-            cachedSlidesData = null; // Ensure it's null if parsing failed
+            localStorage.removeItem(LOCAL_STORAGE_KEY_SLIDES);
+            cachedSlidesData = null;
         }
 
-        // 2. Fetch from Firestore
+        // 2. Fetch from API
         try {
-            const snapshot = await heroCollection.orderBy('order', 'asc').get();
-            const firestoreSlidesArray = [];
+            const response = await fetch(`${API_BASE_URL}/hero_slides`);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+            }
+            const items = await response.json();
 
-            if (snapshot.empty) {
-                console.log("No hero slides found in Firestore. Displaying 'empty' state.");
-                renderSlidesUI([], heroSliderContainer, sliderDotsContainer); // Show "empty" placeholder
-                localStorage.setItem(LOCAL_STORAGE_KEY_SLIDES, JSON.stringify([])); // Cache the empty state
-                // initializeSlider should not be called if no slides
-                return; // Exit after handling empty Firestore result
+            if (!items || items.length === 0) {
+                console.log("No hero slides found via API. Displaying 'empty' state.");
+                renderSlidesUI([], heroSliderContainer, sliderDotsContainer);
+                localStorage.setItem(LOCAL_STORAGE_KEY_SLIDES, JSON.stringify([]));
+                return;
             }
 
-            snapshot.forEach(doc => {
-                // It's good practice to ensure the data has the expected fields
-                const data = doc.data();
-                firestoreSlidesArray.push({
-                    imageUrl: data.imageUrl || '',
-                    heading: data.heading || '',
-                    paragraph: data.paragraph || '',
-                    buttonUrl: data.buttonUrl || '#',
-                    buttonText: data.buttonText || 'Learn More',
-                    // Include order if you need it for any client-side logic, though orderBy handles it for display
-                    order: data.order
-                });
-            });
+            // API should return items in the expected format.
+            // If not, mapping might be needed here, but API was designed to match.
+            // const apiSlidesArray = items.map(item => ({ ... }));
 
-            console.log("Fetched slides from Firestore.");
-            // Render Firestore data and update cache. This will overwrite cached display if it was shown.
-            if (renderSlidesUI(firestoreSlidesArray, heroSliderContainer, sliderDotsContainer)) {
-                localStorage.setItem(LOCAL_STORAGE_KEY_SLIDES, JSON.stringify(firestoreSlidesArray));
-                console.log("Updated local storage with Firestore slides.");
+            console.log("Fetched slides from API.");
+            if (renderSlidesUI(items, heroSliderContainer, sliderDotsContainer)) {
+                localStorage.setItem(LOCAL_STORAGE_KEY_SLIDES, JSON.stringify(items));
+                console.log("Updated local storage with API slides.");
 
                 if (typeof initializeSlider === 'function') {
                     const dynamicSlides = heroSliderContainer.querySelectorAll('.slide');
                     const dynamicDots = sliderDotsContainer.querySelectorAll('.dot');
                     initializeSlider(dynamicSlides, dynamicDots);
                 } else {
-                    console.error("initializeSlider function is not defined. Slider will not work with Firestore data.");
+                    console.error("initializeSlider function is not defined. Slider will not work with API data.");
                 }
             }
 
         } catch (error) {
-            console.error("Error fetching hero slides from Firestore:", error);
-            // If Firestore fails, but we successfully rendered from cache, we keep showing cached data.
-            // If cache was not available or also failed, then show the main error message.
+            console.error("Error fetching hero slides from API:", error);
             if (!renderedFromCache) {
-                heroSliderContainer.innerHTML = `
-                    <div class="slide active">
-                        <img src="https://placehold.co/1200x500/ff0000/ffffff?text=Error+Fetching+Slides" alt="Error loading content" loading="lazy">
-                        <div class="slide-content">
-                            <h1>Error Fetching Slides</h1>
-                            <p>There was an issue retrieving content. Please try refreshing the page or check back later.</p>
-                        </div>
-                    </div>`;
-                sliderDotsContainer.innerHTML = ''; // Clear dots on error
-                const controls = document.querySelector('.slider-controls');
-                if (controls) controls.style.display = 'none'; // Hide controls on error
+                displayErrorPlaceholder(heroSliderContainer, "Error Fetching Slides", "There was an issue retrieving content. Please try refreshing the page.");
             } else {
-                console.log("Firestore fetch failed. Continuing to display data from local storage.");
+                console.log("API fetch for hero slides failed. Continuing to display data from local storage.");
             }
         }
     }
 
-    // Call the function to display hero slides
+    async function displayProgramCards() {
+        if (!programCardsContainer) {
+            console.warn("Program cards container not found.");
+            return;
+        }
+
+        let cachedProgramCards = null;
+        let renderedProgramCardsFromCache = false;
+
+        try {
+            const cachedDataString = localStorage.getItem(LOCAL_STORAGE_KEY_PROGRAM_CARDS);
+            if (cachedDataString) {
+                cachedProgramCards = JSON.parse(cachedDataString);
+                if (cachedProgramCards && cachedProgramCards.length > 0) {
+                    renderProgramCardsUI(cachedProgramCards, programCardsContainer);
+                    renderedProgramCardsFromCache = true;
+                } else {
+                    programCardsContainer.innerHTML = '<p>No featured programs available at the moment. Please check back later.</p>';
+                }
+            }
+        } catch (e) {
+            console.error("Error reading or parsing cached program cards:", e);
+            localStorage.removeItem(LOCAL_STORAGE_KEY_PROGRAM_CARDS);
+        }
+
+        // Fetch program cards from API
+        try {
+            const response = await fetch(`${API_BASE_URL}/programs`);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+            }
+            const items = await response.json();
+
+            if (!items || items.length === 0) {
+                console.log("No program cards found via API.");
+                programCardsContainer.innerHTML = '<p>Discover our range of programs soon!</p>';
+                localStorage.setItem(LOCAL_STORAGE_KEY_PROGRAM_CARDS, JSON.stringify([]));
+                return;
+            }
+
+            // API should return items in the expected format.
+            // const apiProgramCardsArray = items.map(item => ({ ... }));
+
+            renderProgramCardsUI(items, programCardsContainer);
+            localStorage.setItem(LOCAL_STORAGE_KEY_PROGRAM_CARDS, JSON.stringify(items));
+            console.log("Updated local storage with API program cards for home page.");
+
+        } catch (error) {
+            console.error("Error fetching program cards from API for home page:", error);
+            if (!renderedProgramCardsFromCache) {
+                if(programCardsContainer) programCardsContainer.innerHTML = '<p class="error-message">Could not load program information. Please try again later.</p>';
+            } else {
+                 console.log("API fetch for program cards failed. Continuing to display data from local storage.");
+            }
+        }
+    }
+
+    function renderProgramCardsUI(cardsData, container) {
+        if (!container) return;
+        container.innerHTML = ''; // Clear existing
+
+        if (!cardsData || cardsData.length === 0) {
+            container.innerHTML = '<p>No programs to display currently.</p>';
+            return;
+        }
+
+        cardsData.forEach(card => {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'program-card'; // Use the existing class from index.html
+
+            const img = document.createElement('img');
+            img.src = card.imageUrl;
+            img.alt = card.title;
+            img.loading = 'lazy';
+            img.onerror = function() { this.src = 'https://placehold.co/300x200/ff0000/ffffff?text=Image+Error'; };
+
+            const h3 = document.createElement('h3');
+            h3.textContent = card.title;
+
+            const p = document.createElement('p');
+            p.textContent = card.description;
+
+            const a = document.createElement('a');
+            // Correct link path assuming program detail pages are in 'frontend/programs/'
+            // The card.linkUrl from DB should be like 'critical-care-technology.html' (relative to programs folder)
+            // Or it could be an absolute path if stored that way.
+            // For now, assuming it's relative to the 'programs' folder or a full path.
+            a.href = card.linkUrl.startsWith('http') || card.linkUrl.startsWith('/') ? card.linkUrl : `frontend/programs/${card.linkUrl}`;
+            a.className = 'btn'; // Use the existing class
+            a.textContent = 'Learn More';
+
+            cardDiv.appendChild(img);
+            cardDiv.appendChild(h3);
+            cardDiv.appendChild(p);
+            cardDiv.appendChild(a);
+            container.appendChild(cardDiv);
+        });
+    }
+
+
+    // Call functions to display content
+    // No explicit initialization of SDK clients needed anymore
     displayHeroSlides();
+    displayProgramCards();
 });
 
 

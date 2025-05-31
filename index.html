@@ -35,15 +35,13 @@
     <script src="frontend/scripts/main.js"></script>
     <script src="frontend/scripts/whatsapp.js"></script>
 
-    <!-- Firebase SDKs -->
-    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <!-- Add SDKs for Firebase products that you want to use -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-    <!-- Firebase Configuration -->
-    <script src="frontend/scripts/firebase-config.js"></script>
+    <!-- Azure Cosmos DB SDK (frontend scripts no longer use this directly, but keeping if any other script might) -->
+    <!-- For a pure API-driven frontend, this SDK can also be removed if not used by other scripts. -->
+    <script src="https://cdn.jsdelivr.net/npm/@azure/cosmos@3/dist/cosmos-browser.min.js"></script>
+
+    <!-- Removed Azure Configuration: frontend/scripts/azure-config.js -->
+    <!-- Removed Firebase SDKs: firebase-app.js, firebase-auth.js, firebase-firestore.js, firebase-storage.js -->
+    <!-- Removed Firebase Configuration: frontend/scripts/firebase-config.js -->
 
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>

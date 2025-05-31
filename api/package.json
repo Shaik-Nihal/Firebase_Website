@@ -1,0 +1,15 @@
+{
+  "name": "cms-azure-functions-api",
+  "version": "1.0.0",
+  "description": "API for CMS",
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {
+    "@azure/cosmos": "^3.17.0",
+    "@azure/storage-blob": "^12.12.0",
+    "multiparty": "^4.2.3"
+  },
+  "devDependencies": {}
+}

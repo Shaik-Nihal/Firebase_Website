@@ -1,65 +1,122 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Ensure Firebase is initialized
-    if (typeof firebase === 'undefined' || typeof firebase.auth === 'undefined') {
-        console.error("Firebase not initialized. Make sure firebase-config.js is loaded before this script.");
-        alert("Firebase not initialized. Admin panel cannot function.");
-        // Potentially redirect to login or show a more permanent error
-        if (window.location.pathname !== '/admin/index.html' && window.location.pathname !== '/admin/') {
-             window.location.href = 'index.html'; // Redirect to login if not already there
+    // MSAL Configuration (should be consistent with auth.js)
+    // Ideally, this config would be shared, but for simplicity in separate files:
+    const MSAL_CONFIG = {
+        auth: {
+            clientId: "YOUR_B2C_APPLICATION_CLIENT_ID", // Replace with actual Client ID
+            authority: "https://YOUR_B2C_TENANT_NAME.b2clogin.com/YOUR_B2C_TENANT_NAME.onmicrosoft.com/YOUR_SIGN_UP_SIGN_IN_POLICY_NAME", // Replace
+            knownAuthorities: ["YOUR_B2C_TENANT_NAME.b2clogin.com"], // Replace
+            redirectUri: window.location.origin + "/admin/index.html", // Main login redirect
+            postLogoutRedirectUri: window.location.origin + "/admin/index.html"
+        },
+        cache: {
+            cacheLocation: "sessionStorage",
+            storeAuthStateInCookie: false,
         }
-        return;
-    }
+    };
 
-    const auth = firebase.auth();
+    const LOGOUT_REQUEST = {
+        // postLogoutRedirectUri: MSAL_CONFIG.auth.postLogoutRedirectUri, // Optional: Define here or rely on config
+        // mainWindowRedirectUri: MSAL_CONFIG.auth.postLogoutRedirectUri // For popup logout
+    };
+
+    const msalInstance = new msal.PublicClientApplication(MSAL_CONFIG);
+
     const logoutButton = document.getElementById('logout-button');
+    const loginError = document.getElementById('login-error'); // Assuming one exists or might be added for general messages
 
-    // Auth State Listener for Dashboard
-    // Redirect to login if user is not logged in and not on the login page
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            // User is signed in.
-            console.log("Dashboard: User is logged in", user.email);
-            // You can fetch user-specific data here if needed for the dashboard
-        } else {
-            // User is signed out.
-            console.log("Dashboard: User is not logged in. Redirecting to login page.");
-            // Ensure we are not already on a page that doesn't require auth or is the login page itself
-            // to prevent redirect loops if auth.js also has a similar check.
-            // For dashboard.js, it's simpler: if no user, go to index.html (login).
-            if (!window.location.pathname.endsWith('index.html') && !window.location.pathname.endsWith('/admin/') && !window.location.pathname.endsWith('/admin')) {
-                 window.location.href = 'index.html';
-            }
-        }
-    });
-
-    // Handle Logout Button Click
-    if (logoutButton) {
-        logoutButton.addEventListener('click', () => {
-            auth.signOut()
-                .then(() => {
-                    // Sign-out successful.
-                    console.log("User signed out successfully.");
-                    window.location.href = 'index.html'; // Redirect to login page
-                })
-                .catch((error) => {
-                    // An error happened.
-                    console.error("Sign out error:", error);
-                    alert("Error signing out: " + error.message);
-                });
-        });
-    } else {
-        console.warn("Logout button not found on this page.");
+    function displayDashboardError(message) {
+        // You might want a dedicated error display on the dashboard
+        console.error("Dashboard Error:", message);
+        alert(message); // Simple alert for now
     }
 
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-    const heroCollection = db.collection('hero_section');
+    // Function to handle logout
+    function logout() {
+        const account = msalInstance.getActiveAccount();
+        if (account) {
+            LOGOUT_REQUEST.account = account; // Specify which account to log out
+        }
+        msalInstance.logoutRedirect(LOGOUT_REQUEST).catch(error => {
+            console.error("Logout redirect error:", error);
+            displayDashboardError("Logout failed. See console for details.");
+        });
+        // Or use logoutPopup:
+        // msalInstance.logoutPopup(LOGOUT_REQUEST).catch(e => console.error(e));
+    }
+
+    // Attach logout function to the logout button
+    if (logoutButton) {
+        logoutButton.addEventListener('click', logout);
+    } else {
+        console.warn("Logout button not found on dashboard.html.");
+    }
+
+    // Auth check for dashboard
+    function checkAuthState() {
+        const currentAccounts = msalInstance.getAllAccounts();
+        if (currentAccounts === null || currentAccounts.length === 0) {
+            // No user signed in
+            console.log("Dashboard: No active MSAL account found. Redirecting to login.");
+            window.location.href = 'index.html';
+        } else if (currentAccounts.length > 0) {
+            // User is signed in
+            msalInstance.setActiveAccount(currentAccounts[0]);
+            console.log("Dashboard: User is signed in. Account:", currentAccounts[0]);
+            // Proceed to load dashboard content
+            initializeDashboardContent();
+        }
+    }
+
+    // Handle redirect promise (e.g. if dashboard.html itself is a redirect URI for some flow)
+    // For now, main redirection is to index.html, so this is more of a safety check or for future use.
+    msalInstance.handleRedirectPromise()
+        .then((response) => {
+            if (response) {
+                msalInstance.setActiveAccount(response.account);
+                console.log("Dashboard: Handled redirect response. Account:", response.account);
+            }
+            checkAuthState(); // Perform auth check after handling potential redirect
+        })
+        .catch(err => {
+            console.error("Dashboard redirect promise error:", err);
+            displayDashboardError("Error during authentication processing on dashboard.");
+            // Fallback to basic auth check if redirect handling fails for some reason
+            checkAuthState();
+        });
+
+
+    // API Endpoints
+    const API_BASE_URL = "/api"; // Assuming functions are served under /api path
+
+    // Helper function for generating UUIDs (still needed client-side for new items)
+    function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+    // Function to encapsulate all content loading
+    function initializeDashboardContent() {
+        // No SDK initializations needed here anymore for Cosmos or Blob directly
+        console.log("Initializing dashboard content by fetching data from APIs...");
+
+        loadHeroSlides();
+        loadProgramsHeroContent();
+        loadProgramCards();
+
+        // Setup image previews (this is local DOM manipulation, so it stays)
+        setupImagePreview(heroImageUploadInput, heroImagePreview);
+        setupImagePreview(programImageUploadInput, programImagePreview);
+    }
 
     // Hero Section Management Elements
     const heroForm = document.getElementById('hero-form');
     const heroFormTitle = document.getElementById('hero-form-title');
     const heroSlideIdInput = document.getElementById('hero-slideId');
-    const heroImageUrlInput = document.getElementById('hero-image-url'); // Changed from hero-image-upload
+    const heroImageUploadInput = document.getElementById('hero-image-upload');
+    const heroImagePreview = document.getElementById('hero-image-preview');
     const heroHeadingInput = document.getElementById('hero-heading');
     const heroParagraphInput = document.getElementById('hero-paragraph');
     const heroButtonTextInput = document.getElementById('hero-button-text');
@@ -68,9 +125,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const heroSaveButton = document.getElementById('hero-save-button');
     const heroCancelEditButton = document.getElementById('hero-cancel-edit-button');
     const heroSlidesList = document.getElementById('hero-slides-list');
-    // const heroCurrentImagePreview = document.getElementById('hero-current-image'); // Removed
     const heroFormError = document.getElementById('hero-form-error');
     const heroFormSuccess = document.getElementById('hero-form-success');
+    const heroFormStatus = document.createElement('p'); // For image upload status, or use existing success/error
+    heroFormStatus.style.display = 'none';
+    heroForm.appendChild(heroFormStatus); // Add it to the form
 
 
     // Function to display messages
@@ -91,30 +150,56 @@ document.addEventListener('DOMContentLoaded', () => {
         if (heroFormTitle) heroFormTitle.textContent = 'Add New Hero Slide';
         if (heroSaveButton) heroSaveButton.textContent = 'Save Slide';
         if (heroCancelEditButton) heroCancelEditButton.style.display = 'none';
-        // if (heroCurrentImagePreview) { // Removed
-        //     heroCurrentImagePreview.style.display = 'none';
-        //     heroCurrentImagePreview.src = '#';
-        // }
-        if(heroImageUrlInput) heroImageUrlInput.value = ''; // Clear text input
+        if(heroImageUploadInput) heroImageUploadInput.value = null;
+        if(heroImagePreview) {
+            heroImagePreview.src = '#';
+            heroImagePreview.style.display = 'none';
+        }
     }
+
+    // Image Preview Logic
+    function setupImagePreview(fileInput, previewElement) {
+        if (fileInput && previewElement) {
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewElement.src = e.target.result;
+                        previewElement.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    previewElement.src = '#';
+                    previewElement.style.display = 'none';
+                }
+            });
+        }
+    }
+
+    // Removed direct Azure Blob Storage upload function. Will use API.
 
     // Load Hero Slides
     async function loadHeroSlides() {
         if (!heroSlidesList) return;
-        heroSlidesList.innerHTML = '<li class="list-item-placeholder">Loading slides...</li>'; // Placeholder while loading
+        heroSlidesList.innerHTML = '<li class="list-item-placeholder">Loading slides...</li>';
 
         try {
-            const snapshot = await heroCollection.orderBy('order', 'asc').get();
-            if (snapshot.empty) {
+            const response = await fetch(`${API_BASE_URL}/hero_slides`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} - ${await response.text()}`);
+            }
+            const items = await response.json();
+
+            if (!items || items.length === 0) {
                 heroSlidesList.innerHTML = '<li class="list-item-placeholder">No slides found. Add one using the form.</li>';
                 return;
             }
 
             heroSlidesList.innerHTML = ''; // Clear list
-            snapshot.forEach(doc => {
-                const slide = doc.data();
+            items.forEach(slide => {
                 const listItem = document.createElement('li');
-                listItem.setAttribute('data-id', doc.id);
+                listItem.setAttribute('data-id', slide.id);
                 listItem.innerHTML = `
                     <div class="slide-info">
                         <h4>${slide.heading} (Order: ${slide.order})</h4>
@@ -139,10 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (heroForm) {
         heroForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!auth.currentUser) {
-                showMessage(heroFormError, "You must be logged in to save slides.");
-                return;
-            }
+            // Auth check is now page-level via MSAL. If on this page, user is authenticated.
 
             const slideId = heroSlideIdInput.value;
             const heading = heroHeadingInput.value;
@@ -150,44 +232,106 @@ document.addEventListener('DOMContentLoaded', () => {
             const buttonText = heroButtonTextInput.value;
             const buttonUrl = heroButtonUrlInput.value;
             const order = parseInt(heroOrderInput.value, 10);
-            const imageUrl = heroImageUrlInput.value.trim(); // Read from text input
+            // const imageUrl = heroImageUrlInput.value.trim(); // REMOVED
 
             if (!heading || !paragraph || !buttonText || !buttonUrl || isNaN(order)) {
-                showMessage(heroFormError, "Please fill in all required fields (including Image URL if applicable) and ensure order is a number.");
+                showMessage(heroFormError, "Please fill in all required fields and ensure order is a number.");
                 return;
             }
             
             heroSaveButton.disabled = true;
             heroSaveButton.textContent = slideId ? "Updating..." : "Saving...";
             showMessage(heroFormSuccess, ""); // Clear previous success
-            showMessage(heroFormError, ""); // Clear previous error
+            showMessage(heroFormError, "");   // Clear previous error
+            showMessage(heroFormSuccess, ""); // Clear previous success
+
+            let imageUrl = null;
+            const imageFile = heroImageUploadInput.files[0];
+            let existingImageUrl = null;
+            // To get existingImageUrl if editing and no new file is chosen,
+            // we would need to fetch the item first, or the client stores it.
+            // For simplicity, if no new image, current imageUrl on item (if any) is sent back.
+            // The API PUT should handle preserving it if not provided in body.
+            // However, our current client-side logic for edit populates the preview.
+            // We'll fetch it if editing.
+            if (slideId && !imageFile) {
+                 try {
+                    const response = await fetch(`${API_BASE_URL}/hero_slides/${slideId}`); // Assuming a GET by ID endpoint exists or is added
+                    if (response.ok) {
+                        const currentSlide = await response.json();
+                        existingImageUrl = currentSlide.imageUrl;
+                    } else { // if GET by ID is not implemented, this won't work.
+                        // Alternative: if heroImagePreview.src is set and not a data URL, use it.
+                        if (heroImagePreview.src && !heroImagePreview.src.startsWith('data:') && heroImagePreview.src !== '#') {
+                            existingImageUrl = heroImagePreview.src;
+                        }
+                    }
+                 } catch (e) { console.warn("Could not fetch existing image URL for edit.", e); }
+            }
 
 
-            // let imageUrl = heroCurrentImagePreview.src !== '#' ? heroCurrentImagePreview.src : ''; // Removed preview logic
+            if (imageFile) {
+                const formData = new FormData();
+                formData.append('image', imageFile);
+                try {
+                    showMessage(heroFormStatus, "Uploading image via API...", true);
+                    const uploadResponse = await fetch(`${API_BASE_URL}/upload_image`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!uploadResponse.ok) {
+                        const errorBody = await uploadResponse.text();
+                        throw new Error(`Image upload failed: ${uploadResponse.status} - ${errorBody}`);
+                    }
+                    const uploadResult = await uploadResponse.json();
+                    imageUrl = uploadResult.imageUrl;
+                    showMessage(heroFormStatus, "Image uploaded successfully via API.", true);
+                } catch (uploadError) {
+                    showMessage(heroFormError, "Image upload failed: " + uploadError.message, false);
+                    heroSaveButton.disabled = false;
+                    heroSaveButton.textContent = slideId ? "Update Slide" : "Save Slide";
+                    return;
+                }
+            } else if (slideId && existingImageUrl) {
+                 imageUrl = existingImageUrl;
+            }
+
+            const slideData = {
+                heading,
+                paragraph,
+                buttonText,
+                buttonUrl,
+                order,
+                imageUrl: imageUrl,
+                updatedAt: new Date().toISOString()
+            };
 
             try {
-                // No image upload to Firebase Storage anymore
-                // if (imageFile) { ... } block removed
-
-                const slideData = {
-                    heading,
-                    paragraph,
-                    buttonText,
-                    buttonUrl,
-                    order,
-                    imageUrl: imageUrl, // Directly use the URL from the text input
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-
-                if (slideId) { // Editing existing slide
-                    await heroCollection.doc(slideId).update(slideData);
-                    showMessage(heroFormSuccess, "Slide updated successfully!", true);
-                } else { // Adding new slide
-                    slideData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    await heroCollection.add(slideData);
-                     showMessage(heroFormSuccess, "Slide added successfully!", true);
+                let response;
+                if (slideId) {
+                    slideData.id = slideId;
+                    response = await fetch(`${API_BASE_URL}/hero_slides/${slideId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(slideData)
+                    });
+                } else {
+                    slideData.id = generateUUID(); // Client generates ID for new items
+                    slideData.createdAt = new Date().toISOString();
+                    response = await fetch(`${API_BASE_URL}/hero_slides`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(slideData)
+                    });
                 }
 
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`Failed to save slide: ${response.status} - ${errorBody}`);
+                }
+
+                const savedItem = await response.json();
+                showMessage(heroFormSuccess, `Slide ${slideId ? 'updated' : 'added'} successfully!`, true);
                 resetHeroForm();
                 loadHeroSlides();
 
@@ -215,24 +359,30 @@ document.addEventListener('DOMContentLoaded', () => {
             if (target.classList.contains('btn-edit')) {
                 if (!slideId) return;
                 try {
-                    const doc = await heroCollection.doc(slideId).get();
-                    if (doc.exists) {
-                        const slide = doc.data();
+                    const response = await fetch(`${API_BASE_URL}/hero_slides`); // Fetch all to find the one, or implement GET by ID
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const slides = await response.json();
+                    const slide = slides.find(s => s.id === slideId); // Find by id
+
+                    if (slide) {
                         heroFormTitle.textContent = 'Edit Hero Slide';
-                        heroSlideIdInput.value = doc.id;
+                        heroSlideIdInput.value = slide.id;
                         heroHeadingInput.value = slide.heading || '';
                         heroParagraphInput.value = slide.paragraph || '';
                         heroButtonTextInput.value = slide.buttonText || '';
                         heroButtonUrlInput.value = slide.buttonUrl || '';
                         heroOrderInput.value = slide.order || 1;
-                        heroImageUrlInput.value = slide.imageUrl || ''; // Populate the text input
-                        // if (slide.imageUrl) { // Preview logic removed
-                        //     heroCurrentImagePreview.src = slide.imageUrl;
-                        //     heroCurrentImagePreview.style.display = 'block';
-                        // } else {
-                        //     heroCurrentImagePreview.src = '#';
-                        //     heroCurrentImagePreview.style.display = 'none';
-                        // }
+                        // heroImageUrlInput.value = slide.imageUrl || ''; // REMOVED
+
+                        if (slide.imageUrl) {
+                            heroImagePreview.src = slide.imageUrl;
+                            heroImagePreview.style.display = 'block';
+                        } else {
+                            heroImagePreview.src = '#';
+                            heroImagePreview.style.display = 'none';
+                        }
+                        heroImageUploadInput.value = null; // Clear file input
+
                         heroSaveButton.textContent = 'Update Slide';
                         heroCancelEditButton.style.display = 'inline-block';
                         heroForm.scrollIntoView({ behavior: 'smooth' });
@@ -249,16 +399,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!slideId) return;
                 if (confirm('Are you sure you want to delete this slide?')) {
                     try {
-                        const docRef = heroCollection.doc(slideId);
-                        // const docSnap = await docRef.get(); // Not needed if not deleting from storage
-                        // const slideData = docSnap.data(); // Not needed
-
-                        await docRef.delete();
+                        const response = await fetch(`${API_BASE_URL}/hero_slides/${slideId}`, { method: 'DELETE' });
+                        if (!response.ok) {
+                             const errorBody = await response.text();
+                             throw new Error(`Failed to delete slide: ${response.status} - ${errorBody}`);
+                        }
+                        // No JSON to parse for 204 response typically
                         showMessage(heroFormSuccess, "Slide deleted successfully!", true);
-                        
-                        // Remove image deletion from storage
-                        // if (slideData && slideData.imageUrl) { ... } block removed
-
                         loadHeroSlides();
                     } catch (error) {
                         console.error("Error deleting hero slide:", error);
@@ -282,24 +429,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // if (heroImageUploadInput && heroCurrentImagePreview) { ... }
 
 
-    // Initial Load for authenticated users
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            console.log("Dashboard: User is logged in", user.email);
-            loadHeroSlides(); // Load hero slides data
-            loadProgramsHeroContent(); // Load programs page hero content
-            // loadProgramCards(); // Placeholder for next feature
-        } else {
-            console.log("Dashboard: User is not logged in. Redirecting to login page.");
-            if (!window.location.pathname.endsWith('index.html') && !window.location.pathname.endsWith('/admin/') && !window.location.pathname.endsWith('/admin')) {
-                 window.location.href = 'index.html';
-            }
-        }
-    });
+    // Removed Firebase auth.onAuthStateChanged listener. MSAL handles auth state and initializeDashboardContent is called after MSAL checks.
 
     // Programs Page Hero Management
-    const programsPageCollection = db.collection('programs_page');
     const programsHeroDocId = 'main_content'; // Document ID for programs page hero content
+    // Ensure this ID is unique and used as the partition key if the container is partitioned by /id.
 
     const programsHeroForm = document.getElementById('programs-hero-form');
     const programsHeroTitleInput = document.getElementById('programs-hero-title');
@@ -310,21 +444,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load Programs Page Hero Content
     async function loadProgramsHeroContent() {
         if (!programsHeroTitleInput || !programsHeroParagraphInput) return;
+
         try {
-            const doc = await programsPageCollection.doc(programsHeroDocId).get();
-            if (doc.exists) {
-                const data = doc.data();
-                programsHeroTitleInput.value = data.heroTitle || '';
-                programsHeroParagraphInput.value = data.heroParagraph || '';
+            const response = await fetch(`${API_BASE_URL}/programs_page`);
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`HTTP error! status: ${response.status} - ${errorBody}`);
+            }
+            const item = await response.json();
+
+            if (item && item.id === programsHeroDocId) { // API might return default if not found, check ID
+                programsHeroTitleInput.value = item.heroTitle || '';
+                programsHeroParagraphInput.value = item.heroParagraph || '';
                 showMessage(programsHeroStatusDiv, "Content loaded.", true);
             } else {
-                showMessage(programsHeroStatusDiv, "No existing content found. Add new content.", false);
-                programsHeroTitleInput.value = '';
-                programsHeroParagraphInput.value = '';
+                 // This case handles if API returns a default structure without matching ID, or empty
+                showMessage(programsHeroStatusDiv, "No existing content found or content is default. Add/update content.", false);
+                programsHeroTitleInput.value = item.heroTitle || ''; // Show default if provided
+                programsHeroParagraphInput.value = item.heroParagraph || '';
             }
         } catch (error) {
             console.error("Error loading programs page hero content:", error);
             showMessage(programsHeroStatusDiv, "Error loading content: " + error.message, false);
+            programsHeroTitleInput.value = 'Error';
+            programsHeroParagraphInput.value = 'Could not load data.';
         }
     }
 
@@ -332,10 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (programsHeroForm) {
         programsHeroForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!auth.currentUser) {
-                showMessage(programsHeroStatusDiv, "You must be logged in to save.", false);
-                return;
-            }
+            // Auth check is page-level via MSAL
 
             const title = programsHeroTitleInput.value.trim();
             const paragraph = programsHeroParagraphInput.value.trim();
@@ -348,13 +488,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if(saveProgramsHeroButton) saveProgramsHeroButton.disabled = true;
 
             const data = {
+                id: programsHeroDocId, // Ensure the ID is part of the item
                 heroTitle: title,
                 heroParagraph: paragraph,
-                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                lastUpdated: new Date().toISOString()
             };
 
             try {
-                await programsPageCollection.doc(programsHeroDocId).set(data, { merge: true });
+                const response = await fetch(`${API_BASE_URL}/programs_page`, {
+                    method: 'POST', // API uses POST for upsert on this specific singleton resource
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`Failed to save programs page content: ${response.status} - ${errorBody}`);
+                }
+                const savedData = await response.json();
                 showMessage(programsHeroStatusDiv, "Programs hero content saved successfully!", true);
             } catch (error) {
                 console.error("Error saving programs hero content:", error);
@@ -366,7 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Program Cards Management
-    const programsCollection = db.collection('programs');
+    // programsContainer is already defined
 
     const programCardForm = document.getElementById('program-card-form');
     const programCardFormTitle = document.getElementById('program-card-form-title');
@@ -376,13 +526,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const programDurationInput = document.getElementById('program-duration');
     const programLinkUrlInput = document.getElementById('program-link-url');
     const programOrderInput = document.getElementById('program-order');
-    const programImageUrlInput = document.getElementById('program-image-url'); // Changed from program-image-upload
-    // const programImagePreview = document.getElementById('program-image-preview'); // Removed
+    const programImageUploadInput = document.getElementById('program-image-upload');
+    const programImagePreview = document.getElementById('program-image-preview');
     const programCardSaveButton = document.getElementById('program-card-save-button');
     const programCardCancelEditButton = document.getElementById('program-card-cancel-edit-button');
     const programCardsList = document.getElementById('program-cards-list');
     const programCardFormError = document.getElementById('program-card-form-error');
     const programCardFormSuccess = document.getElementById('program-card-form-success');
+    const programCardFormStatus = document.createElement('p'); // For image upload status
+    programCardFormStatus.style.display = 'none';
+    programCardForm.appendChild(programCardFormStatus);
+
 
     // Reset Program Card Form
     function resetProgramCardForm() {
@@ -391,13 +545,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (programCardFormTitle) programCardFormTitle.textContent = 'Add New Program Card';
         if (programCardSaveButton) programCardSaveButton.textContent = 'Save Program Card';
         if (programCardCancelEditButton) programCardCancelEditButton.style.display = 'none';
-        // if (programImagePreview) { // Removed
-        //     programImagePreview.style.display = 'none';
-        //     programImagePreview.src = '#';
-        // }
-        if (programImageUrlInput) programImageUrlInput.value = ''; // Clear text input
-        showMessage(programCardFormError, '', false); // Clear any existing error
-        showMessage(programCardFormSuccess, '', true); // Clear any existing success
+        if (programImageUploadInput) programImageUploadInput.value = null;
+        if (programImagePreview) {
+            programImagePreview.src = '#';
+            programImagePreview.style.display = 'none';
+        }
+        showMessage(programCardFormError, '', false);
+        showMessage(programCardFormSuccess, '', true);
     }
 
     // Load Program Cards
@@ -406,17 +560,22 @@ document.addEventListener('DOMContentLoaded', () => {
         programCardsList.innerHTML = '<li class="list-item-placeholder">Loading program cards...</li>';
 
         try {
-            const snapshot = await programsCollection.orderBy('order', 'asc').get();
-            if (snapshot.empty) {
+            const response = await fetch(`${API_BASE_URL}/programs`);
+             if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`HTTP error! status: ${response.status} - ${errorBody}`);
+            }
+            const items = await response.json();
+
+            if (!items || items.length === 0) {
                 programCardsList.innerHTML = '<li class="list-item-placeholder">No program cards found. Add one using the form.</li>';
                 return;
             }
 
             programCardsList.innerHTML = ''; // Clear list
-            snapshot.forEach(doc => {
-                const card = doc.data();
+            items.forEach(card => {
                 const listItem = document.createElement('li');
-                listItem.setAttribute('data-id', doc.id);
+                listItem.setAttribute('data-id', card.id);
                 listItem.innerHTML = `
                     <div class="card-info">
                         <h4>${card.title} (Order: ${card.order})</h4>
@@ -445,10 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (programCardForm) {
         programCardForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!auth.currentUser) {
-                showMessage(programCardFormError, "You must be logged in to save program cards.");
-                return;
-            }
+            // Auth check is page-level via MSAL
 
             const cardId = programCardIdInput.value;
             const title = programTitleInput.value.trim();
@@ -456,44 +612,102 @@ document.addEventListener('DOMContentLoaded', () => {
             const duration = programDurationInput.value.trim();
             const linkUrl = programLinkUrlInput.value.trim();
             const order = parseInt(programOrderInput.value, 10);
-            const imageUrlFromInput = programImageUrlInput.value.trim(); // Read from text input
+            // const imageUrlFromInput = programImageUrlInput.value.trim(); // REMOVED
 
             if (!title || !description || !duration || !linkUrl || isNaN(order)) {
-                showMessage(programCardFormError, "Please fill in all required fields (including Image URL if applicable) and ensure order is a number.");
+                showMessage(programCardFormError, "Please fill in all required fields and ensure order is a number.");
                 return;
             }
 
             if(programCardSaveButton) programCardSaveButton.disabled = true;
             if(programCardSaveButton) programCardSaveButton.textContent = cardId ? "Updating..." : "Saving...";
             showMessage(programCardFormSuccess, ""); // Clear previous success
-            showMessage(programCardFormError, "");   // Clear previous error
+            showMessage(programCardFormError, "");
+            showMessage(programCardFormSuccess, "");
 
-            // let imageUrl = programImagePreview.src.startsWith('http') ? programImagePreview.src : ''; // Removed preview logic
-            const imageUrl = imageUrlFromInput; // Use the URL from the text input
+            let imageUrl = null;
+            const imageFile = programImageUploadInput.files[0];
+            let existingImageUrl = null;
+            if (cardId && !imageFile) {
+                 try {
+                    // Assuming a GET by ID endpoint for programs, or fetch all and filter
+                    const response = await fetch(`${API_BASE_URL}/programs`); // Or /programs/${cardId} if exists
+                    if (response.ok) {
+                        const programs = await response.json();
+                        const currentCard = programs.find(p => p.id === cardId);
+                        existingImageUrl = currentCard?.imageUrl;
+                    } else {
+                         if (programImagePreview.src && !programImagePreview.src.startsWith('data:') && programImagePreview.src !== '#') {
+                            existingImageUrl = programImagePreview.src;
+                        }
+                    }
+                 } catch(e) { console.warn("Could not fetch existing program image URL for edit.", e); }
+            }
+
+
+            if (imageFile) {
+                const formData = new FormData();
+                formData.append('image', imageFile);
+                try {
+                    showMessage(programCardFormStatus, "Uploading image via API...", true);
+                    const uploadResponse = await fetch(`${API_BASE_URL}/upload_image`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!uploadResponse.ok) {
+                        const errorBody = await uploadResponse.text();
+                        throw new Error(`Image upload failed: ${uploadResponse.status} - ${errorBody}`);
+                    }
+                    const uploadResult = await uploadResponse.json();
+                    imageUrl = uploadResult.imageUrl;
+                    showMessage(programCardFormStatus, "Image uploaded successfully via API.", true);
+                } catch (uploadError) {
+                    showMessage(programCardFormError, "Image upload failed: " + uploadError.message, false);
+                    if(programCardSaveButton) {
+                        programCardSaveButton.disabled = false;
+                        programCardSaveButton.textContent = cardId ? "Update Program Card" : "Save Program Card";
+                    }
+                    return;
+                }
+            } else if (cardId && existingImageUrl) {
+                imageUrl = existingImageUrl;
+            }
+
+            const cardData = {
+                title,
+                description,
+                duration,
+                linkUrl,
+                order,
+                imageUrl: imageUrl,
+                updatedAt: new Date().toISOString()
+            };
 
             try {
-                // No image upload to Firebase Storage anymore
-                // if (imageFile) { ... } block removed
-
-                const cardData = {
-                    title,
-                    description,
-                    duration,
-                    linkUrl,
-                    order,
-                    imageUrl: imageUrl, // Directly use the URL from the text input
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-
-                if (cardId) { // Editing existing card
-                    await programsCollection.doc(cardId).update(cardData);
-                    showMessage(programCardFormSuccess, "Program card updated successfully!", true);
-                } else { // Adding new card
-                    cardData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    await programsCollection.add(cardData);
-                    showMessage(programCardFormSuccess, "Program card added successfully!", true);
+                let response;
+                if (cardId) {
+                    cardData.id = cardId;
+                    response = await fetch(`${API_BASE_URL}/programs/${cardId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(cardData)
+                    });
+                } else {
+                    cardData.id = generateUUID();
+                    cardData.createdAt = new Date().toISOString();
+                    response = await fetch(`${API_BASE_URL}/programs`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(cardData)
+                    });
                 }
 
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`Failed to save program card: ${response.status} - ${errorBody}`);
+                }
+                const savedItem = await response.json();
+                showMessage(programCardFormSuccess, `Program card ${cardId ? 'updated' : 'added'} successfully!`, true);
                 resetProgramCardForm();
                 loadProgramCards();
 
@@ -522,29 +736,34 @@ document.addEventListener('DOMContentLoaded', () => {
             if (target.classList.contains('program-card-edit')) {
                 if (!cardId) return;
                 try {
-                    const doc = await programsCollection.doc(cardId).get();
-                    if (doc.exists) {
-                        const card = doc.data();
+                    const response = await fetch(`${API_BASE_URL}/programs`); // Or /programs/${cardId} if exists
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const programs = await response.json();
+                    const card = programs.find(p => p.id === cardId);
+
+                    if (card) {
                         if(programCardFormTitle) programCardFormTitle.textContent = 'Edit Program Card';
-                        if(programCardIdInput) programCardIdInput.value = doc.id;
+                        if(programCardIdInput) programCardIdInput.value = card.id;
                         if(programTitleInput) programTitleInput.value = card.title || '';
                         if(programDescriptionInput) programDescriptionInput.value = card.description || '';
                         if(programDurationInput) programDurationInput.value = card.duration || '';
                         if(programLinkUrlInput) programLinkUrlInput.value = card.linkUrl || '';
                         if(programOrderInput) programOrderInput.value = card.order || 1;
-                        if(programImageUrlInput) programImageUrlInput.value = card.imageUrl || ''; // Populate text input
+                        // if(programImageUrlInput) programImageUrlInput.value = card.imageUrl || ''; // REMOVED
 
-                        // if (card.imageUrl) { // Preview logic removed
-                        //     if(programImagePreview) {
-                        //         programImagePreview.src = card.imageUrl;
-                        //         programImagePreview.style.display = 'block';
-                        //     }
-                        // } else {
-                        //    if(programImagePreview) {
-                        //         programImagePreview.src = '#';
-                        //         programImagePreview.style.display = 'none';
-                        //    }
-                        // }
+                        if (card.imageUrl) {
+                            if(programImagePreview) {
+                                programImagePreview.src = card.imageUrl;
+                                programImagePreview.style.display = 'block';
+                            }
+                        } else {
+                           if(programImagePreview) {
+                                programImagePreview.src = '#';
+                                programImagePreview.style.display = 'none';
+                           }
+                        }
+                        if(programImageUploadInput) programImageUploadInput.value = null; // Clear file input
+
                         if(programCardSaveButton) programCardSaveButton.textContent = 'Update Program Card';
                         if(programCardCancelEditButton) programCardCancelEditButton.style.display = 'inline-block';
                         if(programCardForm) programCardForm.scrollIntoView({ behavior: 'smooth' });
@@ -563,16 +782,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!cardId) return;
                 if (confirm('Are you sure you want to delete this program card?')) {
                     try {
-                        const docRef = programsCollection.doc(cardId);
-                        // const docSnap = await docRef.get(); // Not needed
-                        // const cardData = docSnap.data(); // Not needed
-
-                        await docRef.delete();
+                        const response = await fetch(`${API_BASE_URL}/programs/${cardId}`, { method: 'DELETE' });
+                        if (!response.ok) {
+                            const errorBody = await response.text();
+                            throw new Error(`Failed to delete program card: ${response.status} - ${errorBody}`);
+                        }
                         showMessage(programCardFormSuccess, "Program card deleted successfully!", true);
-                        
-                        // Remove image deletion from storage
-                        // if (cardData && cardData.imageUrl) { ... } block removed
-                        
                         loadProgramCards();
                     } catch (error) {
                         console.error("Error deleting program card:", error);
@@ -590,14 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-     // Initial Load for authenticated users - extended
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            // ... (other loads like loadHeroSlides, loadProgramsHeroContent)
-            loadProgramCards(); // Load program cards data
-        } else {
-            // ... (redirect logic)
-        }
-    });
+     // Removed Firebase auth.onAuthStateChanged listener for program cards load.
+     // loadProgramCards() is called within initializeDashboardContent() after MSAL auth.
 
 });
