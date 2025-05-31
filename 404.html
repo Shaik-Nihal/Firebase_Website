@@ -1,33 +1,309 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Page Not Found</title>
+<html lang="en">
+<head>
+    <!-- Primary Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollo Knowledge | Transforming Healthcare Through Education</title>
+    <meta name="description" content="Apollo Allied Health Centres offers top healthcare programs in India. Launch your career with our industry-aligned courses in health management, diagnostics, and therapy.">
+    <meta name="keywords" content="Apollo Allied Health Centres, healthcare education, MBA Health Service Management, Medical Laboratory Technology, Dialysis Technology, healthcare degrees India">
+    <meta name="author" content="Apollo Allied Health Centres">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://apollouniversity.edu.in/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Apollo Allied Health Centres">
+    <meta property="og:description" content="Explore career-driven programs in health education at Apollo Allied Health Centres.">
+    <meta property="og:url" content="https://apollouniversity.edu.in/">
+    <meta property="og:image" content="https://apollouniversity.edu.in/frontend/images/ak_logo.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Apollo Allied Health Centres">
+    <meta name="twitter:description" content="Transforming healthcare through world-class education.">
+    <meta name="twitter:image" content="https://apollouniversity.edu.in/frontend/images/ak_logo.png">
+
+    <!-- Favicon -->
+    <link rel="icon" href="frontend/images/ak_logo.png" type="image/png">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="frontend/css/main.css">
+    <link rel="stylesheet" href="frontend/css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="frontend/scripts/main.js"></script>
+    <script src="frontend/scripts/whatsapp.js"></script>
+
+    <!-- Firebase SDKs -->
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <!-- Add SDKs for Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <!-- Firebase Configuration -->
+    <script src="frontend/scripts/firebase-config.js"></script>
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Apollo Allied Health Centres",
+      "url": "https://apollouniversity.edu.in",
+      "logo": "https://apollouniversity.edu.in/frontend/images/ak_logo.png",
+      "sameAs": [
+        "https://facebook.com/apollohealthcentres",
+        "https://twitter.com/apollohealth",
+        "https://linkedin.com/school/apollo-health"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+91-1234567890",
+        "contactType": "Customer Service",
+        "areaServed": "IN",
+        "availableLanguage": "English"
+      }
+    }
+    </script>
+ <!-- Lazysizes Polyfill -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js" async></script>
+    <!-- IntersectionObserver Polyfill -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=IntersectionObserver" defer></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="/frontend/images/ak_logo.png" alt="Apollo Knowledge">
+                </a>
+            </div>
+            <div class="hamburger-menu">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html"  class="active">Home</a></li>
+                    <li><a href="frontend/about-us.html">About Us</a></li>
+                    <li><a href="frontend/programs.html">Programs</a></li>
+                    <li><a href="frontend/centres.html">Centres</a></li>
+                    <li><a href="frontend/admissions.html">Admissions</a></li>
+                    <li><a href="frontend/contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="cta-button">
+                <a href="frontend/enquiry-page.html" class="btn">Enquire Now</a>
+            </div>
+        </div>
+    </header>
+
+   
+<title>Page Not Found - University Name</title>
 
     <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px 16px; border-radius: 3px; }
-      #message h3 { color: #888; font-weight: normal; font-size: 16px; margin: 16px 0 12px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
+      body { background: #878b8f; color: #333; font-family: 'Georgia', serif; margin: 0; padding: 0; }
+      #message { background: #fff; max-width: 600px; margin: 100px auto; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+      #message h2 { color: #d9534f; font-weight: bold; font-size: 24px; margin: 0 0 16px; }
+      #message h1 { font-size: 28px; font-weight: 400; color: #333; margin: 0 0 16px; }
+      #message p { line-height: 1.6; margin: 16px 0; font-size: 16px; }
+      #message a { display: inline-block; text-align: center; background: #0275d8; text-transform: uppercase; text-decoration: none; color: white; padding: 12px 24px; border-radius: 4px; font-size: 14px; margin-top: 20px; }
+      #message a:hover { background: #025aa5; }
+      #footer { text-align: center; margin-top: 40px; font-size: 14px; color: #666; }
     </style>
   </head>
   <body>
     <div id="message">
-      <h2>404</h2>
+      <h2>404 Error</h2>
       <h1>Page Not Found</h1>
-      <p>The specified file was not found on this website. Please check the URL for mistakes and try again.</p>
-      <h3>Why am I seeing this?</h3>
-      <p>This page was generated by the Firebase Command-Line Interface. To modify it, edit the <code>404.html</code> file in your project's configured <code>public</code> directory.</p>
+      <p>We're sorry, but the page you are looking for does not exist. It might have been moved, deleted, or the URL may be incorrect.</p>
+      <p>Please use the navigation menu or return to the homepage to find the information you need.</p>
+      <a href="/">Return to Homepage</a>
     </div>
-  </body>
+    
+
+<!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="frontend/images/ak_logo.png" alt="Apollo Knowledge" loading="lazy">
+                    <p>Apollo Allied Health Centres</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Quick Links</h4>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="frontend/programs.html">Programs</a></li>
+                            <li><a href="frontend/centres.html">Centres</a></li>
+                            <li><a href="frontend/admissions.html">Admissions</a></li>
+                            <li><a href="frontend/contact.html">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Programs</h4>
+                        <ul>
+                            <li><a href="frontend/programs/health-service-management.html">MBA – Health Service Management</a></li>
+                            <li><a href="frontend/programs/physician-assistant.html">B.Sc Physician Assistant</a></li>
+                            <li><a href="frontend/programs/medical-laboratory-technology.html">B.Sc Medical Laboratory Technology</a></li>
+                            <li><a href="frontend/programs.html">View All Programs</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Contact Us</h4>
+                        <ul>
+                            <li><i class="fas fa-phone"></i> +91 1234567890</li>
+                            <li><i class="fas fa-envelope"></i> info@apolloalliedhealth.edu</li>
+                            <li><i class="fas fa-map-marker-alt"></i> Chennai, Coimbatore, Chittoor</li>
+                            <li><a href="https://wa.me/1234567890?text=Hello%20Apollo%20Allied%20Health%20Centre,%20I'm%20interested%20in%20learning%20more%20about%20your%20programs."><i class="fab fa-whatsapp"></i> WhatsApp Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Apollo Allied Health Centres. All rights reserved.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | University Name</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: #f9f9f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            padding: 20px;
+        }
+        .error-graphic {
+            font-size: 120px;
+            font-weight: bold;
+            color: #0073e6;
+            position: relative;
+        }
+        .error-graphic span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            color: #004080;
+        }
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin: 20px 0;
+        }
+        p {
+            font-size: 18px;
+            color: #666;
+            margin: 10px 0 20px;
+        }
+        a {
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 16px;
+            color: #fff;
+            background: #0073e6;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+        a:hover {
+            background: #005bb5;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-graphic">
+            404
+            <span>🙁</span>
+        </div>
+        <h1>Oops! Page Not Found</h1>
+        <p>We can't seem to find the page you're looking for. It might have been moved or deleted.</p>
+        <a href="/">Return to Homepage</a>
+        <div class="footer">
+            <p>&copy; 2025 University Name. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html> -->
