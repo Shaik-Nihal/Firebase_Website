@@ -1,87 +1,129 @@
 /* General Body Styles */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Nunito Sans', sans-serif;
     margin: 0;
-    background-color: #f4f7f6;
-    color: #333;
+    background-color: #F8F9FA; /* Pearl background */
+    color: #212529; /* Dark grey text */
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    font-size: 16px; /* Base font size */
+    line-height: 1.6; /* Improved line height */
 }
 
 .container {
-    width: 90%;
-    max-width: 1200px;
+    width: 95%; /* Increased width */
+    max-width: 1300px; /* Increased max-width */
     margin: 0 auto;
-    padding: 20px;
+    padding: 25px; /* Increased padding */
 }
 
 /* Login Page Styles */
 .login-container {
     background-color: #fff;
-    padding: 30px;
+    padding: 40px; /* Increased padding */
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Slightly enhanced shadow */
     width: 100%;
-    max-width: 400px;
-    margin: 50px auto; /* Center the login box */
+    max-width: 450px; /* Increased max-width */
+    margin: 60px auto; /* Increased margin */
     text-align: center;
 }
 
 .login-container h2 {
-    color: #0056b3; /* Apollo Blue */
-    margin-bottom: 20px;
+    color: #0056b3; /* Royal Blue */
+    margin-bottom: 25px; /* Increased margin */
+    font-weight: 700;
 }
 
 .input-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px; /* Increased margin */
     text-align: left;
 }
 
 .input-group label {
     display: block;
     margin-bottom: 8px;
-    font-weight: bold;
-    color: #555;
+    font-weight: 600;
+    color: #495057;
 }
 
 .input-group input[type="email"],
-.input-group input[type="password"] {
+.input-group input[type="password"],
+.input-group input[type="text"],
+.input-group input[type="number"],
+.input-group textarea,
+.input-group select { /* Consolidated input styling, added select */
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
     box-sizing: border-box;
-    font-size: 16px;
+    font-size: 0.95rem; /* Slightly adjusted for better fit */
+    font-family: 'Nunito Sans', sans-serif;
+    background-color: #fff; /* Ensure background is white */
+    color: #212529; /* Ensure text color is dark */
 }
 
+.input-group input[type="email"]:focus,
+.input-group input[type="password"]:focus,
+.input-group input[type="text"]:focus,
+.input-group input[type="number"]:focus,
+.input-group textarea:focus,
+.input-group select:focus { /* Focus state for all inputs including select */
+    border-color: #0056b3;
+    box-shadow: 0 0 0 0.2rem rgba(0, 86, 179, 0.25);
+    outline: none;
+}
+
+/* Specific styling for file inputs if necessary */
+.input-group input[type="file"] {
+    border: 1px solid #ced4da; /* Consistent border */
+    padding: 0.4rem 0.75rem; /* Adjust padding as file inputs behave differently */
+    border-radius: .25rem;
+    font-size: 0.95rem;
+}
+.input-group input[type="file"]:focus {
+     border-color: #0056b3;
+    box-shadow: 0 0 0 0.2rem rgba(0, 86, 179, 0.25);
+    outline: none;
+}
+
+
 .btn {
-    background-color: #007bff; /* Primary Button Blue */
+    background-color: #0056b3; /* Royal Blue */
     color: white;
-    padding: 12px 20px;
+    padding: 0.6rem 1.2rem; /* Adjusted padding */
     border: none;
-    border-radius: 4px;
+    border-radius: 0.25rem; /* Standardized radius */
     cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-    text-decoration: none; /* For anchor tags styled as buttons */
-    display: inline-block; /* For anchor tags */
+    font-size: 1rem; /* Standardized font size */
+    font-weight: 600; /* Nunito Sans weight */
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .btn:hover {
-    background-color: #0056b3; /* Darker Blue on hover */
+    background-color: #004c9a; /* Darker Royal Blue */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 86, 179, 0.5);
 }
 
 .btn-danger {
-    background-color: #dc3545; /* Red for danger/logout */
+    background-color: #dc3545;
 }
 
 .btn-danger:hover {
-    background-color: #c82333; /* Darker Red on hover */
+    background-color: #c82333;
 }
 
 .error-message {
-    color: #dc3545; /* Red for errors */
+    color: #dc3545;
     margin-top: 15px;
     font-size: 0.9em;
 }
@@ -90,44 +132,51 @@ body {
 .dashboard-header {
     background-color: #0056b3; /* Apollo Blue */
     color: white;
-    padding: 15px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px 0; /* Increased padding */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Softer shadow */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Subtle border */
 }
 
 .dashboard-header .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-left: 25px; /* Match container padding */
+    padding-right: 25px; /* Match container padding */
 }
 
 .dashboard-header h1 {
     margin: 0;
-    font-size: 1.8em;
+    font-size: 1.75em; /* Slightly adjusted size */
+    font-weight: 700; /* Nunito Sans weight */
 }
 
 /* Dashboard Main Content Styles */
 .dashboard-main {
-    flex-grow: 1; /* Make main content take available space */
-    padding-top: 30px;
-    padding-bottom: 30px;
+    flex-grow: 1;
+    padding-top: 40px; /* Increased padding */
+    padding-bottom: 40px; /* Increased padding */
 }
 
 .dashboard-main section {
     background-color: #fff;
-    padding: 20px;
+    padding: 30px; /* Increased padding */
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07); /* Enhanced shadow */
+    margin-bottom: 30px; /* Increased margin */
+    border: 1px solid #dee2e6; /* Light border for sections */
 }
 
 .dashboard-main h2 {
-    color: #0056b3;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
+    color: #0056b3; /* Royal Blue */
+    border-bottom: 2px solid #dee2e6; /* Light grey border */
+    padding-bottom: 15px; /* Increased padding */
     margin-top: 0;
+    margin-bottom: 25px; /* Added margin for spacing after heading */
+    font-weight: 700; /* Nunito Sans weight */
 }
 
-/* Responsive adjustments (optional, but good practice) */
+/* Responsive adjustments */
 @media (max-width: 768px) {
     .dashboard-header .container {
         flex-direction: column;
@@ -148,73 +197,61 @@ body {
 .form-and-list-container {
     display: flex;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    gap: 30px; /* Space between form and list */
-    margin-top: 20px;
+    gap: 40px; /* Increased space */
+    margin-top: 25px; /* Increased margin */
 }
 
 .form-container {
-    flex: 1; /* Takes up half the space */
-    min-width: 300px; /* Minimum width before wrapping */
-    background-color: #fdfdfd;
-    padding: 25px;
+    flex: 1;
+    min-width: 320px;
+    background-color: #fdfdfd; /* Keep light pearl for contrast */
+    padding: 30px; /* Increased padding */
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); /* Slightly enhanced */
+    border: 1px solid #e9ecef; /* Light border */
 }
 
 .list-container {
-    flex: 1; /* Takes up half the space */
-    min-width: 300px; /* Minimum width before wrapping */
-    background-color: #fdfdfd;
-    padding: 25px;
+    flex: 1;
+    min-width: 320px;
+    background-color: #fdfdfd; /* Keep light pearl for contrast */
+    padding: 30px; /* Increased padding */
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); /* Slightly enhanced */
+    border: 1px solid #e9ecef; /* Light border */
 }
 
 .form-container h3, .list-container h3 {
-    color: #0056b3;
+    color: #0056b3; /* Royal Blue */
     margin-top: 0;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+    margin-bottom: 25px; /* Increased margin */
+    border-bottom: 1px solid #dee2e6; /* Light grey border */
+    padding-bottom: 15px; /* Increased padding */
+    font-weight: 700; /* Bolder buttons */
 }
 
-.input-group textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 14px;
-    min-height: 80px;
-}
-
-.input-group input[type="file"] {
-    padding: 10px;
-     /* Standard browser styling for file inputs is often sufficient */
-}
-
-.input-group input[type="number"] {
-     width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 16px;
-}
+/* .input-group textarea is now covered by consolidated input styling */
+/* .input-group input[type="number"] is now covered by consolidated input styling */
 
 
 .form-actions {
-    margin-top: 20px;
+    margin-top: 30px; /* Further increased margin */
     display: flex;
-    gap: 10px; /* Space between buttons */
+    gap: 15px; /* Increased space between buttons */
 }
 
 .btn-secondary {
     background-color: #6c757d;
+    font-weight: 600; /* Consistent weight */
 }
 .btn-secondary:hover {
     background-color: #5a6268;
 }
+.btn-secondary:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5);
+}
+
 
 #hero-slides-list {
     list-style-type: none;
@@ -223,33 +260,34 @@ body {
 
 #hero-slides-list li {
     background-color: #fff;
-    border: 1px solid #eee;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 4px;
+    border: 1px solid #dee2e6; /* Light grey border */
+    padding: 20px; /* Increased padding */
+    margin-bottom: 15px; /* Increased margin */
+    border-radius: 6px; /* Slightly more pronounced radius */
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 #hero-slides-list li .slide-info h4 {
-    margin: 0 0 5px 0;
-    color: #333;
+    margin: 0 0 8px 0; /* Increased margin */
+    color: #212529; /* Dark grey text */
+    font-weight: 600;
 }
 #hero-slides-list li .slide-info p {
     margin: 0;
-    font-size: 0.9em;
-    color: #666;
+    font-size: 0.95em; /* Slightly larger */
+    color: #495057; /* Lighter grey text */
 }
 #hero-slides-list li .slide-info img {
-    border: 1px solid #eee;
+    border: 1px solid #dee2e6; /* Light grey border */
     border-radius: 4px;
 }
 
 
 .slide-actions .btn {
-    padding: 5px 10px;
-    font-size: 0.9em;
+    padding: 6px 12px; /* Adjusted padding */
+    font-size: 0.9rem; /* Standardized font size */
     margin-left: 5px;
 }
 
@@ -334,10 +372,10 @@ small {
 /* Program Cards List specific styles */
 #program-cards-list li {
     background-color: #fff;
-    border: 1px solid #eee;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 4px;
+    border: 1px solid #dee2e6; /* Light grey border */
+    padding: 20px; /* Increased padding */
+    margin-bottom: 15px; /* Increased margin */
+    border-radius: 6px; /* Slightly more pronounced radius */
     display: flex;
     justify-content: space-between;
     align-items: center; /* Align items vertically */
@@ -349,17 +387,18 @@ small {
 
 #program-cards-list li .card-info h4 {
     margin: 0 0 8px 0;
-    color: #333;
+    color: #212529; /* Dark grey text */
+    font-weight: 600;
 }
 
 #program-cards-list li .card-info p {
     margin: 0 0 8px 0;
-    font-size: 0.9em;
-    color: #666;
+    font-size: 0.95em; /* Slightly larger */
+    color: #495057; /* Lighter grey text */
 }
 
 #program-cards-list li .card-info img {
-    border: 1px solid #ddd;
+    border: 1px solid #dee2e6; /* Light grey border */
     border-radius: 4px;
     max-width: 100px; /* Control image size in list */
     height: auto;
@@ -374,10 +413,224 @@ small {
 
 #program-cards-list li .card-actions .btn {
     padding: 6px 12px;
-    font-size: 0.85em;
-    /* margin-left: 5px; */ /* Removed if using gap */
+    font-size: 0.9rem; /* Standardized font size */
+    /* margin-left: 5px; */
 }
 
 
 /* Program Card Image Preview - REMOVED */
 /* #program-image-preview { ... } */
+
+/* Maintenance Mode Section Styles */
+#maintenance-mode-management {
+    /* General section styling applies */
+    border-top: 1px solid #dee2e6; /* Add a top border for visual separation */
+    padding-top: 30px; /* Add padding at the top */
+}
+
+#maintenance-mode-form .input-group {
+    /* General .input-group styling applies */
+    margin-bottom: 25px; /* Consistent margin */
+}
+
+#maintenance-mode-form .input-group label {
+    /* General label styling applies */
+    font-weight: 600;
+}
+
+#maintenance-mode-form #maintenance-mode-toggle {
+    margin-right: 10px;
+    vertical-align: middle;
+    width: auto;
+    height: auto; /* Ensure checkbox size is not overly affected by global input styles */
+    padding: initial; /* Reset padding for checkbox */
+    border: initial; /* Reset border for checkbox */
+    border-radius: initial; /* Reset border-radius for checkbox */
+    box-shadow: none; /* Remove box-shadow for checkbox */
+}
+#maintenance-mode-form #maintenance-mode-toggle:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 86, 179, 0.25); /* Keep focus consistent */
+    outline: none;
+}
+
+
+#maintenance-mode-form label[for="maintenance-mode-toggle"] {
+    vertical-align: middle;
+    font-weight: 400;
+    margin-bottom: 0; /* Remove bottom margin for label next to checkbox */
+}
+
+/* #maintenance-mode-form #maintenance-mode-message is now covered by consolidated input styling */
+
+
+#maintenance-mode-status .success-message,
+#maintenance-mode-status .error-message {
+    margin-top: 15px; /* Increased margin */
+    padding: 12px; /* Increased padding */
+    border-radius: 0.25rem; /* Standardized radius */
+    font-size: 0.95em; /* Slightly larger */
+    display: block;
+}
+
+#maintenance-mode-status .success-message {
+    color: #0f5132; /* Darker green for better contrast */
+    background-color: #d1e7dd;
+    border: 1px solid #badbcc;
+}
+
+#maintenance-mode-status .error-message {
+    color: #842029; /* Darker red for better contrast */
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+}
+
+/* Toggle Switch Styles */
+.toggle-switch-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between label and switch */
+}
+
+.toggle-switch-label {
+    font-weight: 600; /* Match other labels */
+    color: #495057;
+    margin-bottom: 0; /* Remove default label margin */
+}
+
+.toggle-switch-checkbox {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute; /* Keep it out of flow but accessible */
+}
+
+.toggle-switch-slider-label { /* This label acts as the visual switch */
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+    background-color: #ccc; /* Off state color */
+    border-radius: 28px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    flex-shrink: 0; /* Prevent shrinking if label text is long */
+}
+
+.toggle-switch-slider-label::before { /* This is the knob */
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease-in-out;
+}
+
+.toggle-switch-checkbox:checked + .toggle-switch-slider-label {
+    background-color: #0056b3; /* Royal Blue for on state */
+}
+
+.toggle-switch-checkbox:checked + .toggle-switch-slider-label::before {
+    transform: translateX(22px); /* (width - (knob_width + 2*offset)) = 50 - (20 + 2*4) = 50 - 28 = 22 */
+}
+
+/* Focus style for accessibility - applied to the visible slider part */
+.toggle-switch-checkbox:focus + .toggle-switch-slider-label {
+    box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.35); /* Adjusted focus color */
+}
+
+/* Analytics Section Styles */
+#analytics-management {
+    /* General section styling applies */
+    border-top: 1px solid #dee2e6; /* Add a top border for visual separation */
+    padding-top: 30px;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Adjusted minmax for better fit */
+    gap: 25px; /* Increased gap */
+    margin-bottom: 30px; /* Increased margin */
+}
+
+.analytics-card {
+    background-color: #fff;
+    padding: 25px; /* Increased padding */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06); /* Slightly softer shadow */
+    text-align: center;
+    border: 1px solid #e9ecef;
+}
+
+.analytics-card h4 {
+    font-size: 1rem; /* Adjusted size */
+    color: #495057; /* Subtler heading color */
+    margin-top: 0;
+    margin-bottom: 12px; /* Increased margin */
+    font-weight: 600; /* Nunito Sans weight */
+}
+
+.analytics-value {
+    font-size: 2rem; /* Larger value text */
+    font-weight: 700; /* Bold value */
+    color: #0056b3; /* Royal Blue for value */
+    margin-bottom: 5px;
+}
+
+.analytics-chart-container,
+.analytics-top-pages-container {
+    background-color: #fff;
+    padding: 25px; /* Increased padding */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    margin-bottom: 30px; /* Increased margin */
+    border: 1px solid #e9ecef;
+}
+
+.analytics-chart-container h4,
+.analytics-top-pages-container h4 {
+    font-size: 1.1rem; /* Slightly larger heading for these sections */
+    color: #0056b3; /* Royal Blue heading */
+    margin-top: 0;
+    margin-bottom: 20px; /* Increased margin */
+    font-weight: 600;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 10px;
+}
+
+.chart-placeholder {
+    text-align: center;
+    padding: 40px 20px; /* More padding */
+    color: #6c757d; /* Subtler text color */
+    border: 2px dashed #e9ecef; /* Dashed border for placeholder */
+    border-radius: 6px;
+}
+
+.chart-placeholder p {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+.chart-placeholder small {
+    font-size: 0.85rem;
+}
+
+.analytics-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.analytics-list li {
+    padding: 12px 0; /* Increased padding */
+    border-bottom: 1px solid #e9ecef; /* Lighter border */
+    font-size: 0.95rem;
+    color: #212529;
+    display: flex;
+    justify-content: space-between;
+}
+
+.analytics-list li:last-child {
+    border-bottom: none;
+}

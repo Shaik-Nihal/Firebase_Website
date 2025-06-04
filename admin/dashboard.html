@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Apollo Knowledge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -154,6 +155,58 @@
                         <li class="list-item-placeholder">No program cards found. Add one using the form.</li>
                     </ul>
                 </div>
+            </div>
+        </section>
+
+        <section id="maintenance-mode-management">
+            <h2>Site Maintenance Mode</h2>
+            <form id="maintenance-mode-form">
+                <div class="input-group toggle-switch-container">
+                    <label for="maintenance-mode-toggle" class="toggle-switch-label">Enable Maintenance Mode</label>
+                    <input type="checkbox" id="maintenance-mode-toggle" name="maintenanceModeToggle" class="toggle-switch-checkbox">
+                    <label for="maintenance-mode-toggle" class="toggle-switch-slider-label"></label>
+                </div>
+                <div class="input-group">
+                    <label for="maintenance-mode-message">Maintenance Message</label>
+                    <textarea id="maintenance-mode-message" name="maintenance-mode-message" rows="4"></textarea>
+                </div>
+                <button type="submit" id="save-maintenance-mode-button" class="btn">Save Settings</button>
+                <div id="maintenance-mode-status" style="margin-top: 15px;"></div>
+            </form>
+        </section>
+
+        <section id="analytics-management">
+            <h2>Website Analytics Overview</h2>
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h4>Total Visitors (Last 30d)</h4>
+                    <p class="analytics-value" id="analytics-total-visitors">--</p>
+                </div>
+                <div class="analytics-card">
+                    <h4>Page Views (Last 30d)</h4>
+                    <p class="analytics-value" id="analytics-page-views">--</p>
+                </div>
+                <div class="analytics-card">
+                    <h4>Bounce Rate</h4>
+                    <p class="analytics-value" id="analytics-bounce-rate">--%</p>
+                </div>
+                <div class="analytics-card">
+                    <h4>Avg. Session Duration</h4>
+                    <p class="analytics-value" id="analytics-avg-session-duration">--</p>
+                </div>
+            </div>
+            <div class="analytics-chart-container">
+                <h4>Visitors This Week (Mockup)</h4>
+                <div id="analytics-visitor-chart-placeholder" class="chart-placeholder">
+                    <p>[Bar chart illustrating daily visitors for the last 7 days]</p>
+                    <small><em>Actual chart rendering would require a charting library and real data.</em></small>
+                </div>
+            </div>
+            <div class="analytics-top-pages-container">
+                <h4>Top Pages (by Views - Last 30d)</h4>
+                <ul id="analytics-top-pages-list" class="analytics-list">
+                    <li>Loading...</li>
+                </ul>
             </div>
         </section>
     </main>

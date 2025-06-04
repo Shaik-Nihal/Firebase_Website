@@ -1,0 +1,42 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #FEFCF7; /* Pearl background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #333;
+}
+
+.maintenance-container {
+    padding: 30px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 90%;
+}
+
+.maintenance-container h1 {
+    color: #0056b3; /* Royal Blue / Apollo Blue */
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+#maintenance-message-content {
+    font-size: 1.2em;
+    color: #4169E1; /* Royal Blue for message text */
+    line-height: 1.6;
+    min-height: 50px; /* To avoid layout shift while loading */
+}
+
+/* Optional: Logo styling if you add one */
+/*
+.maintenance-container img {
+    margin-top: 25px;
+    max-width: 150px;
+    height: auto;
+}
+*/

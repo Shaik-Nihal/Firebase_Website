@@ -281,6 +281,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Preview image before upload - REMOVED
     // if (heroImageUploadInput && heroCurrentImagePreview) { ... }
 
+    // Analytics Elements
+    const analyticsTotalVisitorsEl = document.getElementById('analytics-total-visitors');
+    const analyticsPageViewsEl = document.getElementById('analytics-page-views');
+    const analyticsBounceRateEl = document.getElementById('analytics-bounce-rate');
+    const analyticsAvgSessionDurationEl = document.getElementById('analytics-avg-session-duration');
+    const analyticsVisitorChartPlaceholderEl = document.getElementById('analytics-visitor-chart-placeholder');
+    const analyticsTopPagesListEl = document.getElementById('analytics-top-pages-list');
 
     // Initial Load for authenticated users
     auth.onAuthStateChanged((user) => {
@@ -288,7 +295,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Dashboard: User is logged in", user.email);
             loadHeroSlides(); // Load hero slides data
             loadProgramsHeroContent(); // Load programs page hero content
-            // loadProgramCards(); // Placeholder for next feature
+            loadProgramCards(); // Ensure this is also called
+            loadMaintenanceModeSettings(); // Ensure this is also called
+            loadMockAnalyticsData(); // Load mock analytics data
         } else {
             console.log("Dashboard: User is not logged in. Redirecting to login page.");
             if (!window.location.pathname.endsWith('index.html') && !window.location.pathname.endsWith('/admin/') && !window.location.pathname.endsWith('/admin')) {
@@ -595,9 +604,116 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             // ... (other loads like loadHeroSlides, loadProgramsHeroContent)
             loadProgramCards(); // Load program cards data
+            loadMaintenanceModeSettings(); // Load maintenance mode settings
+            loadMockAnalyticsData(); // Load mock analytics data
         } else {
             // ... (redirect logic)
         }
     });
 
+    // Maintenance Mode Management
+    const siteStatusCollection = db.collection('site_status');
+    const siteStatusDocId = 'current_settings';
+
+    const maintenanceModeForm = document.getElementById('maintenance-mode-form');
+    const maintenanceModeToggle = document.getElementById('maintenance-mode-toggle');
+    const maintenanceModeMessageInput = document.getElementById('maintenance-mode-message');
+    const saveMaintenanceModeButton = document.getElementById('save-maintenance-mode-button');
+    const maintenanceModeStatusDiv = document.getElementById('maintenance-mode-status');
+
+    async function loadMaintenanceModeSettings() {
+        if (!maintenanceModeToggle || !maintenanceModeMessageInput || !maintenanceModeStatusDiv) {
+            console.warn("Maintenance mode elements not found on this page.");
+            return;
+        }
+
+        try {
+            const doc = await siteStatusCollection.doc(siteStatusDocId).get();
+            if (doc.exists) {
+                const data = doc.data();
+                maintenanceModeToggle.checked = data.isActive || false;
+                maintenanceModeMessageInput.value = data.message || '';
+                showMessage(maintenanceModeStatusDiv, "Settings loaded successfully.", true);
+            } else {
+                maintenanceModeToggle.checked = false;
+                maintenanceModeMessageInput.value = '';
+                showMessage(maintenanceModeStatusDiv, "No existing settings found. Defaults applied.", false);
+            }
+        } catch (error) {
+            console.error("Error loading maintenance mode settings:", error);
+            showMessage(maintenanceModeStatusDiv, "Error loading settings: " + error.message, false);
+            maintenanceModeToggle.checked = false;
+            maintenanceModeMessageInput.value = '';
+        }
+    }
+
+    if (maintenanceModeForm) {
+        maintenanceModeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!auth.currentUser) {
+                showMessage(maintenanceModeStatusDiv, "You must be logged in to save settings.", false);
+                return;
+            }
+
+            const isActive = maintenanceModeToggle.checked;
+            const message = maintenanceModeMessageInput.value.trim();
+
+            if (isActive && !message) {
+                showMessage(maintenanceModeStatusDiv, "Maintenance message cannot be empty when mode is active.", false);
+                return;
+            }
+
+            if (saveMaintenanceModeButton) saveMaintenanceModeButton.disabled = true;
+            showMessage(maintenanceModeStatusDiv, "Saving settings...", true);
+
+            try {
+                await siteStatusCollection.doc(siteStatusDocId).set({
+                    isActive,
+                    message,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                showMessage(maintenanceModeStatusDiv, "Settings saved successfully!", true);
+            } catch (error) {
+                console.error("Error saving maintenance mode settings:", error);
+                showMessage(maintenanceModeStatusDiv, "Error saving settings: " + error.message, false);
+            } finally {
+                if (saveMaintenanceModeButton) saveMaintenanceModeButton.disabled = false;
+            }
+        });
+    }
+
+    // Mock Analytics Data Function
+    function loadMockAnalyticsData() {
+        const totalVisitors = Math.floor(Math.random() * 7000) + 2500;
+        const pageViews = totalVisitors * (Math.floor(Math.random() * 2) + 1.5);
+        const bounceRate = (Math.random() * 40 + 30).toFixed(1); // %
+        const avgSessionMinutes = Math.floor(Math.random() * 5) + 1;
+        const avgSessionSeconds = Math.floor(Math.random() * 60);
+        const avgSessionDuration = `${avgSessionMinutes}m ${avgSessionSeconds}s`;
+        const mockTopPages = [
+            { name: "/index.html", views: Math.floor(pageViews * 0.3) },
+            { name: "/frontend/programs.html", views: Math.floor(pageViews * 0.2) },
+            { name: "/frontend/about-us.html", views: Math.floor(pageViews * 0.15) },
+            { name: "/frontend/contact.html", views: Math.floor(pageViews * 0.1) },
+            { name: "/frontend/admissions.html", views: Math.floor(pageViews * 0.05) }
+        ];
+
+        if (analyticsTotalVisitorsEl) analyticsTotalVisitorsEl.textContent = totalVisitors.toLocaleString();
+        if (analyticsPageViewsEl) analyticsPageViewsEl.textContent = Math.floor(pageViews).toLocaleString();
+        if (analyticsBounceRateEl) analyticsBounceRateEl.textContent = `${bounceRate}%`;
+        if (analyticsAvgSessionDurationEl) analyticsAvgSessionDurationEl.textContent = avgSessionDuration;
+
+        if (analyticsVisitorChartPlaceholderEl) {
+            analyticsVisitorChartPlaceholderEl.innerHTML = '<p>[Bar chart illustrating daily visitors for the last 7 days. Mock data: approx. ' + (totalVisitors / 30 * 7).toLocaleString(undefined, {maximumFractionDigits:0}) + ' visitors this week]</p><small><em>Actual chart rendering requires a charting library and real data.</em></small>';
+        }
+
+        if (analyticsTopPagesListEl) {
+            analyticsTopPagesListEl.innerHTML = ''; // Clear previous items
+            mockTopPages.sort((a, b) => b.views - a.views).forEach(page => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<span>${page.name}</span> <span>${page.views.toLocaleString()} views</span>`;
+                analyticsTopPagesListEl.appendChild(listItem);
+            });
+        }
+    }
 });
